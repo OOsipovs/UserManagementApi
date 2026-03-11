@@ -10,7 +10,7 @@ using UserManagementApi.Domain.Interfaces;
 
 namespace UserManagementApi.Application.Services
 {
-    public class UserService
+    public class UserService : IUserService
     {
         private readonly IUserRepository _userRepository;
         private readonly IMessagePublisher _messagePublisher;
