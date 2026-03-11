@@ -22,6 +22,7 @@ namespace UserManagementApi.API.Controllers
             return (user == null) ? NotFound() : Ok(user);
         }
 
+        [HttpPost]
         public async Task<IActionResult> Create([FromBody]CreateUserRequest request)
         {
             var user = await _userService.CreateUserAsync(request);
