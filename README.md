@@ -2,6 +2,8 @@
 
 A **.NET 9 Web API** for managing users and their profile information, built with Clean Architecture, Entity Framework Core, and PostgreSQL.
 
+> **Repository:** https://github.com/OOsipovs/UserManagementApi
+
 ---
 
 ## Table of Contents
@@ -18,63 +20,52 @@ A **.NET 9 Web API** for managing users and their profile information, built wit
 
 ## Architecture
 
-This project follows **Clean Architecture** (also known as Onion Architecture), which organises code into concentric layers where dependencies always point **inward** — outer layers depend on inner layers, never the reverse.
+In this project I've decide to follow **Clean Architecture**, organising the codebase into four concentric layers where dependencies always point **inward** — outer layers depend on inner layers, never the reverse.
+It might seem overcomplicated for this particular task , but I wanted to demonstrate how to structure a real-world application with clear separation of concerns and testability in mind.
 
-### Why Clean Architecture?
+### Layers
 
-| Benefit | How it applies here |
+| Layer | Project | Responsibility |
+|---|---|---|
+| **Domain** | `UserManagementApi.Domain` | Core entities (`User`, `Profile`) and repository interfaces (`IUserRepository`). No dependencies on any other layer. |
+| **Application** | `UserManagementApi.Application` | Business logic (`UserService`), service interfaces (`IUserService`), DTOs (`CreateUserRequest`, `UserResponse`). Depends only on Domain. |
+| **Infrastructure** | `UserManagementApi.Infrastructure` | EF Core `AppDbContext`, `UserRepository`, `MessagePublisher`. Implements interfaces defined in Domain and Application. |
+| **API** | `UserManagementApi.API` | ASP.NET Core controllers, middleware, DI registration, app entry point. Depends on all other layers. |
+
+### Key Design Decisions
+
+| Decision | Reason |
 |---|---|
-| **Separation of concerns** | Business logic in `Application` is completely isolated from HTTP and database details |
-| **Testability** | `UserService` and controllers are unit-tested by mocking interfaces — no real database needed |
-| **Replaceability** | The `IMessagePublisher` stub can be swapped for a real RabbitMQ implementation without touching any business logic |
-| **Maintainability** | Each layer has a single responsibility, making future changes predictable and low-risk |
+| `IUserRepository` defined in **Domain** | Keeps persistence details out of business logic; EF Core is swappable without changing the domain |
+| `IUserService` defined in **Application** | Controllers depend on an abstraction, enabling full unit testing without a real database |
+| `IMessagePublisher` stub in **Infrastructure** | Simulates event publishing (e.g. RabbitMQ) without requiring a broker to run locally |
+| DTOs in **Application**, not **API** | Decouples the HTTP contract from the transport layer |
+| Auto-migration on startup | `db.Database.Migrate()` in `Program.cs` ensures the schema is always up-to-date with no manual steps |
 
----
+### Request Flow
+
+1. **HTTP Request**: A client sends an HTTP request to the API.
+2. **UsersController** (API layer): Receives the request and calls the appropriate service.
+3. **UserService** (Application layer): Contains business logic and calls the repository.
+4. **UserRepository** (Infrastructure layer): Interacts with the database via EF Core and Mesage bus via IMessagePublisher.
 
 ## Technologies
 
-| Technology | Purpose |
-|---|---|
-| **.NET 9** | Target framework |
-| **ASP.NET Core Web API** | HTTP API host |
-| **Entity Framework Core 9** | ORM and database access |
-| **Npgsql** | PostgreSQL EF Core provider |
-| **PostgreSQL 17** | Relational database (via Docker) |
-| **Swashbuckle / Swagger UI** | Interactive API documentation |
-| **xUnit** | Unit test framework |
-| **Moq** | Mocking library for unit tests |
-| **FluentAssertions** | Readable assertion syntax in tests |
-| **Docker Compose** | Local PostgreSQL setup |
+| Technology | Version | Purpose |
+|---|---|---|
+| **.NET** | 9 | Target framework |
+| **ASP.NET Core Web API** | 9 | HTTP API host |
+| **Entity Framework Core** | 9.0.14 | ORM and database access |
+| **Npgsql EF Core Provider** | 9.0.4 | PostgreSQL driver for EF Core |
+| **PostgreSQL** | 17 | Relational database (via Docker) |
+| **Swashbuckle / Swagger UI** | 9.0.6 | Interactive API documentation |
+| **xUnit** | 2.9.2 | Unit test framework |
+| **Moq** | 4.20.72 | Mocking library for unit tests |
+| **FluentAssertions** | 8.8.0 | Readable assertion syntax in tests |
+| **Docker Compose** | — | Local PostgreSQL setup |
 
----
-
-## Project Structure
-
-```plaintext
-UserManagementApi.sln                  # Solution file
-/.github/
-  └── workflows/                       # GitHub Actions workflows
-/src
-  ├── UserManagementApi/               # Main web API project
-  |    ├── Controllers/                # API controllers
-  |    ├── DTOs/                       # Data transfer objects
-  |    ├── Middleware/                 # Custom middleware
-  |    ├── Properties/                 # Project properties
-  |    └── Program.cs                  # App entry point
-  |___	
-  ├── UserManagementApi.Tests/         # Unit test project
-  |    ├── Controllers/                # Tests for API controllers
-  |    ├── Services/                   # Tests for application services
-  |    └── UserManagementApi.Tests.csproj # Test project file
-  └── README.md                        # Project documentation
-
-```
-
----
 
 ## Getting Started
-
-To run this project locally:
 
 ### Prerequisites
 
@@ -84,51 +75,55 @@ To run this project locally:
 ### 1. Clone the repository
 
 ```bash
-git clone https://github.com/your-username/UserManagementApi.git
+git clone https://github.com/OOsipovs/UserManagementApi.git
 cd UserManagementApi
 ```
 
-### 2. Start the PostgreSQL database
+### 2. Start the PostgreSQL container
 
 ```bash
 docker-compose up -d
 ```
 
-This starts a PostgreSQL 17 instance with:
-- **Host:** `localhost:5432`
-- **Database:** `homeworkdb`
-- **Username:** `taskuser`
-- **Password:** `mypassword`
-
-### 3. Run the API
+### 3. Run the application
 
 ```bash
-dotnet run --project src/UserManagementApi/UserManagementApi.csproj
+dotnet run --project UserManagementApi.API/UserManagementApi.API.csproj
 ```
 
-The API will be available at `https://localhost:5001` (or `http://localhost:5000` for HTTP).
 
-The application will automatically apply EF Core migrations on startup — no manual migration step needed.
-
-> Alternatively, open the solution in **Visual Studio 2022** and press **F5**.
-
-### 4. Access Swagger UI
-
-Swagger UI opens automatically in the browser at:
-
-- **HTTP:** http://localhost:5257
-- **HTTPS:** https://localhost:7255
-
-Use it to explore and test all endpoints interactively without Postman.
+ **Visual Studio:** Open the solution and press **F5**.
+ 
+ On startup, EF Core migrations are applied automatically — the `Users` and `Profiles` tables are created if they don't exist.
+ 
+ ### 5. Access Swagger UI
+ Swagger UI is served at the root URL in Development mode:
+ 
+> | Profile | URL |
+> |---|---|
+> | HTTP | http://localhost:5257 |
+> | HTTPS | https://localhost:7255 |
 
 ---
 
 ## API Endpoints
 
-| Method | Endpoint | Description |
-|---|---|---|
-| `GET` | `/api/users/{id}` | Get a user with their profile by GUID |
-| `POST` | `/api/users` | Create a new user and profile |
+| Method | Endpoint | Description | Success | Failure |
+|---|---|---|---|---|
+| `POST` | `/api/users` | Create a new user and profile | `201 Created` | `400 Bad Request` |
+| `GET` | `/api/users/{id}` | Get a user with their profile by GUID | `200 OK` | `404 Not Found` |
+
+### Request Validation
+
+`CreateUserRequest` fields are validated via Data Annotations before reaching the service layer:
+
+| Field | Rules |
+|---|---|
+| `username` | Required, max 100 characters |
+| `email` | Required, valid email format, max 200 characters |
+| `firstName` | Required, max 100 characters |
+| `lastName` | Required, max 100 characters |
+| `dateOfBirth` | Required |
 
 ---
 
@@ -143,76 +138,68 @@ POST /api/users
 Content-Type: application/json
 
 {
-  "username": "jdoe",
-  "password": "Password123",
-  "email": "jdoe@example.com"
+    "username": "jdoe",
+    "email": "jdoe@example.com",
+    "firstName": "John",
+    "lastName": "Doe",
+    "dateOfBirth": "1990-05-15T00:00:00Z"
 }
 ```
 
-### Get all users
-
-```http
-GET /api/users
-Authorization: Bearer your_jwt_token
-```
-
-# Response
+**Response**
 ```http
 HTTP/1.1 201 Created
 Content-Type: application/json
 
 {
-  "id": "e7b1aef0-e123-4dca-9c6e-f061ffd9e929",
-  "username": "jdoe",
-  "email": "jdoe@example.com",
-  "profile": {
+    "id": "e7b1aef0-e123-4dca-9c6e-f061ffd9e929",
+    "username": "jdoe",
+    "email": "jdoe@example.com",
     "firstName": "John",
-    "lastName": "Doe",  
-    "bio": "Software developer",
-    "photoUrl": null
-  }
+    "lastName": "Doe",
+    "dateOfBirth": "1990-05-15T00:00:00Z"
 }
 ```
 
-### Get a user by ID
+
+### Get a user by ID — `GET /api/users/:userId`
+**Request:**
 
 ```http
 GET /api/users/e7b1aef0-e123-4dca-9c6e-f061ffd9e929
-Authorization: Bearer your_jwt_token
 ```
 
-# Response
+**Response**
 ```http
 HTTP/1.1 200 OK
 Content-Type: application/json
 
 {
   "id": "e7b1aef0-e123-4dca-9c6e-f061ffd9e929",
-  "username": "jdoe",   
+  "username": "jdoe",
   "email": "jdoe@example.com",
-  "profile": {
-    "firstName": "John",
-    "lastName": "Doe",
-    "bio": "Software developer",
-    "photoUrl": null
-  }
+  "firstName": "John",
+  "lastName": "Doe",
+  "dateOfBirth": "1990-05-15T00:00:00Z"
 }
 ```
 
 **Response — 404 Not Found** (ID does not exist)
 
+**Response — `404 Not Found`:** returned when the GUID does not exist in the database.
+
 ---
 
 ## Running Tests
 
-Unit tests use mocks — **no database or Docker required** to run them.
+Unit tests use mocks only — **no database or Docker required**.
+
+> **Visual Studio:** Open __Test > Test Explorer__ and click **Run All**.
+
+### Test Coverage
 
 | Test class | What is tested |
 |---|---|
-| `UserServiceTests` | Business logic — get by ID, create user, publish order and call counts |
-| `UserControllerTests` | HTTP responses — 200, 201, 404 status codes and response bodies |
-| `CreateUserRequestValidationTests` | DTO validation — required fields, max lengths, email format |
-
-To run tests in Visual Studio, open **Test Explorer** (__Test > Test Explorer__) and click **Run All**.
-Alternatively, run tests from the command line:
-```bash
+| `UserServiceTests` | `GetUserByIdAsync` — returns correct response, returns `null` when not found, handles missing profile; `CreateUserAsync` — maps all fields, publishes message exactly once, publishes *after* save |
+| `UserControllerTests` | `GetById` — returns `200` with body, returns `404`; `Create` — returns `201` with correct location header, calls service exactly once |
+| `CreateUserRequestValidationTests` | Required fields, max-length rules on all string fields, email format validation |
