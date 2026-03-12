@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using UserManagementApi.Application.DTOs;
+﻿using UserManagementApi.Application.DTOs;
 
 namespace UserManagementApi.Application.Interfaces
 {

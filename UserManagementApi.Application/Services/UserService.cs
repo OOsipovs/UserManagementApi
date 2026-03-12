@@ -40,7 +40,6 @@ namespace UserManagementApi.Application.Services
         {
             var user = new User
             {
-                Id = Guid.NewGuid(),
                 Username = request.Username,
                 Email = request.Email,
                 Profile = new Profile

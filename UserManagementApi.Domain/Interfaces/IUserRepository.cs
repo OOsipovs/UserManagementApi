@@ -5,7 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using UserManagementApi.Domain.Entities;
 
-namespace UserManagementApi.Application.Interfaces
+namespace UserManagementApi.Domain.Interfaces
 {
     public interface IUserRepository
     {

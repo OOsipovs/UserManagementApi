@@ -1,6 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using UserManagementApi.Application.Interfaces;
 using UserManagementApi.Domain.Entities;
+using UserManagementApi.Domain.Interfaces;
 
 namespace UserManagementApi.Infrastructure.Persistence.Repositories
 {
@@ -24,9 +24,9 @@ namespace UserManagementApi.Infrastructure.Persistence.Repositories
             .FirstOrDefaultAsync(u => u.Id == id);
         }
 
-        public Task SaveChangesAsync()
+        public async Task SaveChangesAsync()
         {
-            return _context.SaveChangesAsync();
+            await _context.SaveChangesAsync();
         }
     }
 }
