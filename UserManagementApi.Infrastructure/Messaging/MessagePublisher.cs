@@ -1,7 +1,7 @@
 ﻿using Microsoft.Extensions.Logging;
 using System.Text.Json;
 using UserManagementApi.Domain.Entities;
-using UserManagementApi.Domain.Interfaces;
+using UserManagementApi.Application.Interfaces;
 
 namespace UserManagementApi.Infrastructure.Messaging
 {

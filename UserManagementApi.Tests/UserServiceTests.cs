@@ -1,6 +1,7 @@
 ﻿using FluentAssertions;
 using Moq;
 using UserManagementApi.Application.DTOs;
+using UserManagementApi.Application.Interfaces;
 using UserManagementApi.Application.Services;
 using UserManagementApi.Domain.Entities;
 using UserManagementApi.Domain.Interfaces;

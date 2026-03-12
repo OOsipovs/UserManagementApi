@@ -1,6 +1,6 @@
 ﻿using UserManagementApi.Domain.Entities;
 
-namespace UserManagementApi.Domain.Interfaces
+namespace UserManagementApi.Application.Interfaces
 {
     public interface IMessagePublisher
     {

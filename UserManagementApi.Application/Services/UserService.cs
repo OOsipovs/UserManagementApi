@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using UserManagementApi.Application.DTOs;
+﻿using UserManagementApi.Application.DTOs;
 using UserManagementApi.Application.Interfaces;
 using UserManagementApi.Domain.Entities;
 using UserManagementApi.Domain.Interfaces;
@@ -24,18 +19,9 @@ namespace UserManagementApi.Application.Services
         public async Task<UserResponse?> GetUserByIdAsync(Guid id)
         {
             var user = await _userRepository.GetByIdAsync(id);
-            if (user == null) return null;
-
-            return new UserResponse
-            {
-                Id = user.Id,
-                Username = user.Username,
-                Email = user.Email,
-                FirstName = user.Profile?.FirstName ?? string.Empty,
-                LastName = user.Profile?.LastName ?? string.Empty,
-                DateOfBirth = user.Profile?.DateOfBirth ?? default
-            };
+            return user is null ? null : MapToResponse(user);
         }
+
         public async Task<UserResponse> CreateUserAsync(CreateUserRequest request)
         {
             var user = new User
@@ -53,18 +39,19 @@ namespace UserManagementApi.Application.Services
             await _userRepository.AddAsync(user);
             await _userRepository.SaveChangesAsync();
 
-            // Publish an event to RabbitMQ
             await _messagePublisher.PublishUserCreatedAsync(user);
 
-            return new UserResponse
-            {
-                Id = user.Id,
-                Username = user.Username,
-                Email = user.Email,
-                FirstName = user.Profile?.FirstName ?? string.Empty,
-                LastName = user.Profile?.LastName ?? string.Empty,
-                DateOfBirth = user.Profile?.DateOfBirth ?? default
-            };
+            return MapToResponse(user);
         }
+
+        private static UserResponse MapToResponse(User user) => new()
+        {
+            Id = user.Id,
+            Username = user.Username,
+            Email = user.Email,
+            FirstName = user.Profile?.FirstName ?? string.Empty,
+            LastName = user.Profile?.LastName ?? string.Empty,
+            DateOfBirth = user.Profile?.DateOfBirth ?? default
+        };
     }
 }

@@ -185,8 +185,6 @@ Content-Type: application/json
 }
 ```
 
-**Response — 404 Not Found** (ID does not exist)
-
 **Response — `404 Not Found`:** returned when the GUID does not exist in the database.
 
 ---
