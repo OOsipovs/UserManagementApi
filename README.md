@@ -21,7 +21,7 @@ A **.NET 9 Web API** for managing users and their profile information, built wit
 ## Architecture
 
 In this project I've decide to follow **Clean Architecture**, organising the codebase into four concentric layers where dependencies always point **inward** — outer layers depend on inner layers, never the reverse.
-It might seem overcomplicated for this particular task , but I wanted to demonstrate how to structure a real-world application with clear separation of concerns and testability in mind.
+It might seem overcomplicated for this particular task , but I wanted to demonstrate how I would structure a real-world application with clear separation of concerns and testability in mind.
 
 ### Layers
 
