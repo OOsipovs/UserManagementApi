@@ -87,6 +87,7 @@ docker-compose up -d
 
 ### 3. Run the application
 
+ **CLI:**
 ```bash
 dotnet run --project UserManagementApi.API/UserManagementApi.API.csproj
 ```
