@@ -49,7 +49,7 @@ It might seem overcomplicated for this particular task , but I wanted to demonst
 3. **UserService** (Application layer): Contains business logic and calls the repository.
 4. **UserRepository** (Infrastructure layer): Interacts with the database via EF Core and Mesage bus via IMessagePublisher.
 
-## Production Considerations
+### Production Considerations
 
 This project is scoped as a homework task. The following improvements would be made before taking it to production:
 
