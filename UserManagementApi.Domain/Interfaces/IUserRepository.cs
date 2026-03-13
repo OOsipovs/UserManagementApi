@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using UserManagementApi.Domain.Entities;
+﻿using UserManagementApi.Domain.Entities;
 
 namespace UserManagementApi.Domain.Interfaces
 {

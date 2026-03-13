@@ -49,6 +49,18 @@ It might seem overcomplicated for this particular task , but I wanted to demonst
 3. **UserService** (Application layer): Contains business logic and calls the repository.
 4. **UserRepository** (Infrastructure layer): Interacts with the database via EF Core and Mesage bus via IMessagePublisher.
 
+## Production Considerations
+
+This project is scoped as a homework task. The following improvements would be made before taking it to production:
+
+| Area | Current state | Production recommendation |
+|---|---|---|
+| **Cancellation** | Not implemented | Propagate `CancellationToken` from controller through service and repository to all EF Core and async calls, so in-flight DB queries are cancelled when a client disconnects |
+| **Auto-migration on startup** | `db.Database.Migrate()` runs on every startup | Run migrations as a separate deployment step or a one-off job to avoid race conditions with multiple running instances |
+| **Duplicate users** | No uniqueness check | Add unique indexes on `Email` and `Username` and handle `DbUpdateException` with a `409 Conflict` response |
+| **Global error handling** | `UseExceptionHandler()` returns generic errors | Map domain-specific exceptions (e.g. `NotFoundException`) to structured `ProblemDetails` responses |
+| **Message broker** | Stub logger only | Replace `MessagePublisher` with a real RabbitMQ/Azure Service Bus implementation behind the existing `IMessagePublisher` interface — no other layers need to change |
+
 ## Technologies
 
 | Technology | Version | Purpose |
