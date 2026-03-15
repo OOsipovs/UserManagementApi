@@ -110,13 +110,13 @@ dotnet run --project UserManagementApi.API/UserManagementApi.API.csproj
  
  On startup, EF Core migrations are applied automatically — the `Users` and `Profiles` tables are created if they don't exist.
  
- ### 5. Access Swagger UI
- Swagger UI is served at the root URL in Development mode:
- 
-> | Profile | URL |
-> |---|---|
-> | HTTP | http://localhost:5257 |
-> | HTTPS | https://localhost:7255 |
+### 5. Access Swagger UI
+
+Swagger UI is available in Development mode at:
+
+> **http://localhost:5257**
+
+> **Note:** Use the **http** profile when running the application. The HTTPS profile is not configured for local development.
 
 ---
 
