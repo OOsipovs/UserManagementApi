@@ -56,6 +56,7 @@ This project is scoped as a homework task. The following improvements would be m
 | Area | Current state | Production recommendation |
 |---|---|---|
 | **Secrets management** | Database credentials (`Username`, `Password`) are stored in plaintext in `appsettings.json` and committed to source control | Move all sensitive configuration to a secure store such as **Azure Key Vault**, or .NET **User Secrets** (for local dev). Inject them via environment variables or the secrets provider at runtime — never commit credentials to a repository |
+| **Secure API endpoints** | Not implemented | The API is currently open for development/testing. In production, require authentication and proper authorization for all endpoints.  |
 | **Cancellation** | Not implemented | Propagate `CancellationToken` from controller through service and repository to all EF Core and async calls, so in-flight DB queries are cancelled when a client disconnects |
 | **Auto-migration on startup** | `db.Database.Migrate()` runs on every startup | Run migrations as a separate deployment step or a one-off job to avoid race conditions with multiple running instances |
 | **Duplicate users** | No uniqueness check | Add unique indexes on `Email` and `Username` and handle `DbUpdateException` with a `409 Conflict` response |
