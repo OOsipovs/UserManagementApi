@@ -11,15 +11,13 @@ A **.NET 9 Web API** for managing users and their profile information, built wit
 
 - [Architecture](#architecture)
 - [Technologies](#technologies)
-- [Getting Started](#getting-started)
 - [Project Structure](#project-structure)
+- [Getting Started](#getting-started)
 - [API Endpoints](#api-endpoints)
 - [Example Requests](#example-requests)
 - [Running Tests](#running-tests)
 
 ---
-
-## Project Structure
 
 ## Architecture
 
